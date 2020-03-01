@@ -25,6 +25,7 @@
         single-line
         hide-details
         outlined
+        clearable
       ></v-text-field>
     </v-app-bar>
 
@@ -68,9 +69,9 @@
       <v-card>
         <v-card-title>{{ dialogTitle }}</v-card-title>
         <v-card-text>
-          <v-text-field v-model="part.category" label="分類" required></v-text-field>
+          <v-text-field v-model="part.category" :rules="[ rules.required ]" label="分類" required></v-text-field>
           <v-text-field v-model="part.model" label="型番" required></v-text-field>
-          <v-text-field v-model.number="part.count" label="個数" required></v-text-field>
+          <v-text-field v-model.number="part.count" type="number" hint="負の数でカウントしない" label="個数" required></v-text-field>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -116,8 +117,7 @@ export default class App extends Vue
     model: '',
     count: 1,
   };
-
-index = -1;
+  index = -1;
   part: PartWithId = { ...this.default_part };
 
   headers = [
@@ -128,6 +128,10 @@ index = -1;
     { text: '操作', value: 'actions', sortable: false },
   ];
   parts: PartWithId[] = [];
+
+  rules = {
+    required: () => !!this.part.category || '必須',
+  };
 
   get dialogTitle()
   {
