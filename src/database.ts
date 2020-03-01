@@ -32,7 +32,7 @@ export const Database = {
     request.send(encodeURIComponent(JSON.stringify({ op: 'remove', id: id })));
   },
 
-  enumerate: <T>(onload: (response: T) => void) =>
+  enumerate: <T>(onload: (response: T) => void, onerror: Func) =>
   {
     const request = new XMLHttpRequest();
     request.open('GET', 'https://script.google.com/macros/s/AKfycbw7vHCzXf2ZyZz29sHwLmDgLhCdKtljRtu8l8GLoCAYAM22gORx/exec');
@@ -40,6 +40,7 @@ export const Database = {
     request.onload = () => {
         onload(request.response);
     }
+    request.onerror = onerror;
     request.send();
   },
 }

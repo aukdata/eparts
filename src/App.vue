@@ -20,6 +20,7 @@
       <v-btn
         text
         icon
+        :disabled="processing"
         @click="refresh()"
       >
         <v-icon>fas fa-sync</v-icon>
@@ -48,10 +49,10 @@
         class="parts-table"
       >
         <template v-slot:item.actions="{ item }">
-          <v-icon small class="pr-2" color="blue" @blur="updatePart(item)" @click="item.count++"> fas fa-plus </v-icon>
-          <v-icon small class="pr-2" color="red" @blur="updatePart(item)" @click="item.count--"> fas fa-minus </v-icon>
+          <v-icon small class="pr-2" color="blue" :disabled="processing" @blur="updatePart(item)" @click="item.count++"> fas fa-plus </v-icon>
+          <v-icon small class="pr-2" color="red" :disabled="processing" @blur="updatePart(item)" @click="item.count--"> fas fa-minus </v-icon>
           <v-icon small class="pr-6" color="green" @click="startEditingPart(item)"> fas fa-edit </v-icon>
-          <v-icon small class="pr-2" color="lightgray" @click="deletePart(item)"> fas fa-trash </v-icon>
+          <v-icon small class="pr-2" color="lightgray" :disabled="processing" @click="deletePart(item)"> fas fa-trash </v-icon>
         </template>
         <template v-slot:item.count="{ item }">
           {{ item.count >= 0 ? item.count : '─' }}
@@ -66,20 +67,22 @@
       <v-card>
         <v-card-title>{{ dialogTitle }}</v-card-title>
         <v-card-text>
-          <v-text-field v-model="part.category" :rules="[ rules.required ]" label="分類" required></v-text-field>
-          <v-text-field v-model="part.model" label="型番" required></v-text-field>
-          <v-text-field v-model.number="part.count" type="number" hint="負の数でカウントしない" label="個数" required></v-text-field>
+          <v-text-field v-model="part.category" :rules="[ rules.required ]" label="分類"></v-text-field>
+          <v-text-field v-model="part.model" label="型番"></v-text-field>
+          <v-text-field v-model.number="part.count" type="number" hint="負の数でカウントしない" label="個数"></v-text-field>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="hideDialog()">キャンセル</v-btn>
-          <v-btn text color="blue" @click="save()">保存</v-btn>
+          <v-btn :disabled="processing" text color="blue" @click="save()">保存</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <v-snackbar
       v-model="snackbar"
+      absolute
+      bottom
     >
       {{ message }}
       <v-btn text @click="snackbar = false">閉じる</v-btn>
@@ -107,6 +110,8 @@ export default class App extends Vue
   search = '';
   dialog = false;
   message = '';
+
+  processing = false;
 
   default_part: PartWithId = {
     id: '',
@@ -151,8 +156,13 @@ export default class App extends Vue
   refresh()
   {
     this.parts = [];
+    this.processing = true;
     Database.enumerate<PartWithId[]>(response => {
       this.parts = response;
+      this.processing = false;
+    }, () => {
+      this.message = '読み込み中にエラーが発生しました';
+      this.processing = false;
     });
   }
 
@@ -170,32 +180,39 @@ export default class App extends Vue
       };
 
       this.message = '追加しています...';
+      this.processing = true;
       Database.insert(NewPart, () => {
         this.parts.push(NewPart);
         this.message = '追加しました';
+        this.processing = false;
 
         this.hideDialog();
       }, () => {
         this.message = '追加中にエラーが発生しました';
+        this.processing = false;
       });
   }
 
   deletePart(part: PartWithId)
   {
     this.message = '削除しています...';
+    this.processing = true;
     Database.remove(part.id, () => {
       const index = this.parts.indexOf(part);
       this.parts.splice(index, 1);
 
       this.message = '削除しました';
+      this.processing = false;
     }, () => {
       this.message = '削除中にエラーが発生しました';
+      this.processing = false;
     });
   }
 
   updatePart(part: PartWithId)
   {
     this.message = '更新しています...';
+    this.processing = true;
     part.count = Math.max(part.count, -1);
 
     Database.update(part, () => {
@@ -203,9 +220,11 @@ export default class App extends Vue
       Object.assign(this.parts[index], part);
 
       this.message = '更新しました';
+      this.processing = false;
       this.hideDialog();
     }, () => {
       this.message = '更新中にエラーが発生しました';
+      this.processing = false;
     });
   }
 
