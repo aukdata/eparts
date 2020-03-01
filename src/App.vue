@@ -81,7 +81,7 @@
     </v-dialog>
 
     <v-snackbar
-      :value="snackbar"
+      v-model="snackbar"
     >
       {{ message }}
       <v-btn text @click="message = ''">閉じる</v-btn>
@@ -137,6 +137,10 @@ index = -1;
   get snackbar()
   {
     return this.message !== '';
+  }
+  set snackbar(value)
+  {
+    if (!value) this.message = '';
   }
 
   created()
