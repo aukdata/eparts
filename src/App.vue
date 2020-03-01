@@ -53,6 +53,9 @@
           <v-icon small class="pr-6" color="green" @click="startEditingPart(item)"> fas fa-edit </v-icon>
           <v-icon small class="pr-2" color="lightgray" @click="deletePart(item)"> fas fa-trash </v-icon>
         </template>
+        <template v-slot:item.count="{ item }">
+          {{ item.count >= 0 ? item.count : '多数' }}
+        </template>
       </v-data-table>
     </v-content>
 
@@ -193,6 +196,8 @@ export default class App extends Vue
   updatePart(part: PartWithId)
   {
     this.message = '更新しています...';
+    part.count = Math.max(part.count, -1);
+
     Database.update(part, () => {
       const index = this.parts.findIndex(v => v.id === part.id);
       Object.assign(this.parts[index], part);
