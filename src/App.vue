@@ -54,7 +54,7 @@
           <v-icon small class="pr-2" color="lightgray" @click="deletePart(item)"> fas fa-trash </v-icon>
         </template>
         <template v-slot:item.count="{ item }">
-          {{ item.count >= 0 ? item.count : '多数' }}
+          {{ item.count >= 0 ? item.count : '─' }}
         </template>
       </v-data-table>
     </v-content>
@@ -117,11 +117,11 @@ export default class App extends Vue
   part: PartWithId = { ...this.default_part };
 
   headers = [
-    { text: 'ID', value: 'id', width: 20 },
+    { text: 'ID', value: 'id', width: 20, filterable: false },
     { text: '種類', value: 'category' },
     { text: '型番', value: 'model' },
-    { text: '個数', value: 'count' },
-    { text: '操作', value: 'actions', sortable: false },
+    { text: '個数', value: 'count', filterable: false },
+    { text: '操作', value: 'actions', sortable: false, filterable: false },
   ];
   parts: PartWithId[] = [];
 
