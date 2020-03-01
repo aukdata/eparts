@@ -6,7 +6,7 @@ export const Database = {
   {
     const request = new XMLHttpRequest()
     request.open('POST', 'https://script.google.com/macros/s/AKfycbw7vHCzXf2ZyZz29sHwLmDgLhCdKtljRtu8l8GLoCAYAM22gORx/exec')
-    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('Content-Type', 'plain/text');
     request.onload = onload;
     request.onerror = onerror;
     request.send(encodeURIComponent(JSON.stringify({ op: 'insert', part: part })));
@@ -16,7 +16,7 @@ export const Database = {
   {
     const request = new XMLHttpRequest();
     request.open('POST', 'https://script.google.com/macros/s/AKfycbw7vHCzXf2ZyZz29sHwLmDgLhCdKtljRtu8l8GLoCAYAM22gORx/exec');
-    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('Content-Type', 'plain/text');
     request.onload = onload;
     request.onerror = onerror;
     request.send(encodeURIComponent(JSON.stringify({ op: 'update', part: part })));
@@ -26,7 +26,7 @@ export const Database = {
   {
     const request = new XMLHttpRequest();
     request.open('POST', 'https://script.google.com/macros/s/AKfycbw7vHCzXf2ZyZz29sHwLmDgLhCdKtljRtu8l8GLoCAYAM22gORx/exec');
-    request.setRequestHeader('Content-Type', 'application/json');
+    request.setRequestHeader('Content-Type', 'plain/text');
     request.onload = onload;
     request.onerror = onerror;
     request.send(encodeURIComponent(JSON.stringify({ op: 'remove', id: id })));

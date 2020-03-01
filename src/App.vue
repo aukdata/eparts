@@ -110,19 +110,15 @@ export default class App extends Vue
   dialog = false;
   message = '';
 
-  index = -1;
-  part: PartWithId = {
-    id: '',
-    category: '',
-    model: '',
-    count: 1,
-  };
   default_part: PartWithId = {
     id: '',
     category: '',
     model: '',
     count: 1,
   };
+
+index = -1;
+  part: PartWithId = { ...this.default_part };
 
   headers = [
     { text: 'ID', value: 'id', width: 20 },
