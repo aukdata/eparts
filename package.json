@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "deploy": "npm run build && cp -r dist docs"
+    "deploy": "rm -rf docs && npm run build && cp -r dist docs"
   },
   "dependencies": {
     "@types/shortid": "0.0.29",

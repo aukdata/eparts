@@ -14,7 +14,15 @@
         icon
         @click.stop="dialog = true"
       >
-        <v-icon>fas fa-plus</v-icon>
+        <v-icon>fas fa-plus-circle</v-icon>
+      </v-btn>
+
+      <v-btn
+        text
+        icon
+        @click="refresh()"
+      >
+        <v-icon>fas fa-sync</v-icon>
       </v-btn>
 
       <v-text-field
@@ -36,28 +44,14 @@
         :search="search"
         item-key="index"
 
-        loading="No parts registered."
         locale="ja-JP"
-
-        disable-sort
-        hide-default-footer
-
         class="parts-table"
       >
         <template v-slot:item.actions="{ item }">
-          <v-icon
-            small
-            class="mr-2"
-            @click="editPart(item)"
-          >
-            fas fa-edit
-          </v-icon>
-          <v-icon
-            small
-            @click="deletePart(item)"
-          >
-            fas fa-trash
-          </v-icon>
+          <v-icon small class="pr-2" color="blue" @blur="updatePart(item)" @click="item.count++"> fas fa-plus </v-icon>
+          <v-icon small class="pr-2" color="red" @blur="updatePart(item)" @click="item.count--"> fas fa-minus </v-icon>
+          <v-icon small class="pr-6" color="green" @click="startEditingPart(item)"> fas fa-edit </v-icon>
+          <v-icon small class="pr-2" color="lightgray" @click="deletePart(item)"> fas fa-trash </v-icon>
         </template>
       </v-data-table>
     </v-content>
@@ -85,7 +79,7 @@
       v-model="snackbar"
     >
       {{ message }}
-      <v-btn text @click="message = ''">閉じる</v-btn>
+      <v-btn text @click="snackbar = false">閉じる</v-btn>
     </v-snackbar>
   </v-app>
 </template>
@@ -117,7 +111,6 @@ export default class App extends Vue
     model: '',
     count: 1,
   };
-  index = -1;
   part: PartWithId = { ...this.default_part };
 
   headers = [
@@ -135,7 +128,7 @@ export default class App extends Vue
 
   get dialogTitle()
   {
-    return this.index === -1 ? '追加' : '編集';
+    return this.part.id === '' ? '追加' : '編集';
   }
 
   get snackbar()
@@ -160,11 +153,28 @@ export default class App extends Vue
     });
   }
 
-  editPart(part: PartWithId)
+  startEditingPart(part: PartWithId)
   {
-    this.index = this.parts.indexOf(part);
     this.part = { ...part };
     this.dialog = true;
+  }
+
+  addPart(part: Part)
+  {
+      const NewPart = {
+        ...part,
+        id: shortid.generate(),
+      };
+
+      this.message = '追加しています...';
+      Database.insert(NewPart, () => {
+        this.parts.push(NewPart);
+        this.message = '追加しました';
+
+        this.hideDialog();
+      }, () => {
+        this.message = '追加中にエラーが発生しました';
+      });
   }
 
   deletePart(part: PartWithId)
@@ -180,49 +190,36 @@ export default class App extends Vue
     });
   }
 
+  updatePart(part: PartWithId)
+  {
+    this.message = '更新しています...';
+    Database.update(part, () => {
+      const index = this.parts.findIndex(v => v.id === part.id);
+      Object.assign(this.parts[index], part);
+
+      this.message = '更新しました';
+      this.hideDialog();
+    }, () => {
+      this.message = '更新中にエラーが発生しました';
+    });
+  }
+
   save()
   {
-    if (this.index === -1)
+    if (this.part.id === '')
     {
-      const NewPart = {
-        ...this.part,
-        id: shortid.generate(),
-      };
-
-      this.message = '追加しています...';
-      Database.insert(NewPart, () => {
-        this.parts.push(NewPart);
-        this.message = '追加しました';
-
-        this.hideDialog();
-      }, () => {
-        this.message = '追加中にエラーが発生しました';
-      });
+      this.addPart(this.part);
     }
     else
     {
-      this.message = '更新しています...';
-      Database.update(this.part, () => {
-        Object.assign(this.parts[this.index], this.part);
-        this.message = '更新しました';
-
-        this.hideDialog();
-      }, () => {
-        this.message = '更新中にエラーが発生しました';
-      });
+      this.updatePart(this.part);
     }
   }
 
   hideDialog()
   {
     this.dialog = false;
-    this.index = -1;
     this.part = { ...this.default_part };
-  }
-
-  generateId()
-  {
-    return Math.floor(Number.MAX_SAFE_INTEGER * Math.random());
   }
 }
 
