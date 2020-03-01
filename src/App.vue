@@ -161,10 +161,6 @@ export default class App extends Vue
     this.index = this.parts.indexOf(part);
     this.part = { ...part };
     this.dialog = true;
-
-    console.log('ADD INIT');
-    console.log(part);
-    console.log(this.index);
   }
 
   deletePart(part: PartWithId)
@@ -183,8 +179,6 @@ export default class App extends Vue
   {
     if (this.index === -1)
     {
-      console.log('ADD')
-
       const NewPart = {
         ...this.part,
         id: shortid.generate(),
@@ -201,8 +195,6 @@ export default class App extends Vue
     }
     else
     {
-      console.log('EDIT')
-
       Database.update(this.part, () => {
         Object.assign(this.parts[this.index], this.part);
         this.message = '更新しました';
