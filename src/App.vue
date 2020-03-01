@@ -165,6 +165,7 @@ index = -1;
 
   deletePart(part: PartWithId)
   {
+    this.message = '削除しています...';
     Database.remove(part.id, () => {
       const index = this.parts.indexOf(part);
       this.parts.splice(index, 1);
@@ -184,6 +185,7 @@ index = -1;
         id: shortid.generate(),
       };
 
+      this.message = '追加しています...';
       Database.insert(NewPart, () => {
         this.parts.push(NewPart);
         this.message = '追加しました';
@@ -195,6 +197,7 @@ index = -1;
     }
     else
     {
+      this.message = '更新しています...';
       Database.update(this.part, () => {
         Object.assign(this.parts[this.index], this.part);
         this.message = '更新しました';
