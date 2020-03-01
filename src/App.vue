@@ -230,6 +230,12 @@ export default class App extends Vue
 
   save()
   {
+    if (this.part.category === '')
+    {
+      this.message = '分類が入力されていません';
+      return;
+    }
+
     if (this.part.id === '')
     {
       this.addPart(this.part);
